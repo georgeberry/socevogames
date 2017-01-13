@@ -5,43 +5,6 @@ import matplotlib.pyplot as plt
 
 """
 Social replicator simulation
-
-This takes payoffs and associations and translates them into replicator dynamics
-We then solve for the long-term equilibrium
-
-Maybe a method to draw a phase diagram would be nice
-    Hard to generalize to high-enough dimensions, though
-
-Inputs:
-    A: payoff matrix, n by n
-    W: an association matrix, should be symmetric?
-
-Complications:
-    What's the easiest way to allow users to specify more complicated game forms?
-        For instance, let's say there are two groups, A and B
-        A-B could be one game, and A-A B-B could be another
-            (ingroup-outgroup split)
-        What's the easiest way to to allow a user to represent this?
-
-==== Thoughts ====
-
-There are many ways to do this
-If we are at first mostly interested in two-group games, let's do that
-There will be plenty of time for abstraction later
-
-strategies are called 'c' and 'd'
-    'c' : 0
-    'd' : 1
-
-So let's write this code assuming that #groups = 2, #strat = 2
-
-We use scipy odeint
-    This takes a function, initial conditions, and time (along with optional args)
-    It goes through the time steps you give it, and uses the function to update
-    The function must satisfy the following conditions:
-        it takes the state at some time, X
-        it takes time
-        it returns the change in the system at that time point
 """
 
 class StageGame(object):
