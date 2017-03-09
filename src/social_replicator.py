@@ -5,6 +5,17 @@ import matplotlib.pyplot as plt
 
 """
 Social replicator simulation
+
+Set up for 2 strategy, 2 group games.
+
+Philosophy is simple:
+    - Define StageGame instances for each pairwise game agents play
+    - Each SocialGroup class stores interaction and game info for that group
+    - make_groups function makes groups from a matrix of games
+        and interaction rates
+    - Give these groups to the SocialGame class which will do simulation and
+        make plots
+    - An example can be found in the __main__ block
 """
 
 class StageGame(object):
@@ -20,7 +31,6 @@ class StageGame(object):
 
     """
     def __init__(self, strategies, payoffs):
-        self.name = None
         self.strategies = strategies
         self.payoff_matrix = np.array(payoffs)
         self.name_to_idx_dict = {k:v for v,k in enumerate(strategies)}
@@ -56,6 +66,7 @@ class StageGame(object):
     def __call__(self, ingroup_strat_idx, outgroup_strat_idx):
         return self.payoff_from_idx(ingroup_strat_idx, outgroup_strat_idx)
 
+
 class SocialGroup(object):
     """
     Contains the information for a social group
@@ -63,7 +74,7 @@ class SocialGroup(object):
         group_name: str
         ingroup_game: StageGame
         outgroup_game: StageGame
-        structure: np array
+        structure: numpy array
     """
     def __init__(
         self,
@@ -104,7 +115,8 @@ class SocialGroup(object):
         utility_o = rate_o * (p_o * game_o(s, 0) + (1 - p_o) * game_o(s, 1))
         return utility_i + utility_o
 
-    def avg_payoff(self, population_state, structure):
+    def avg_payoff(self, pop_state):
+        p = pop_state[self.idx]
         avg = p * self.payoff(0, pop_state) + (1 - p) * self.payoff(1, pop_state)
         return avg
 
@@ -124,14 +136,15 @@ def make_groups(interaction_matrix, game_matrix, names=None):
         groups.append(g)
     return groups
 
+
 class SocialGame(object):
     """
     Class for a social evolutionary game
     This class does solving and plotting
 
     The actual calculus functions are d_grp_dt, d_pop_dt, and sim
-    Sim calls scipy integrate, which calls d_pop_dt, which calls d_grp_dt
-    d_grp_dt actually calculates stuff based on payoffs
+        d_grp_dt and d_pop_dt make phase spaces
+        sim will give you a single trajectory
 
     Inputs:
         social_groups: list of social groups
@@ -168,7 +181,7 @@ class SocialGame(object):
         t = np.linspace(**kwargs)
         return scipy.integrate(self.d_pop_dt, init_conditions, t)
 
-    def plot_phase_space(self, title, path, fname):
+    def plot_phase_space(self): #, title, path, fname):
         """
         We want to cover the
         """
@@ -193,49 +206,31 @@ class SocialGame(object):
         plt.ylabel('$p^b$', **axis_font)
         plt.xlim([-.1, 1.1])
         plt.ylim([-.1, 1.1])
-        plt.title(title, **title_font)
-        plt.savefig(path + fname + '.pdf', format='pdf')
-        plt.close()
+        # plt.title(title, **title_font)
+        plt.show()
+        # plt.savefig(path + fname + '.pdf', format='pdf')
+        # plt.close()
 
 if __name__ == '__main__':
-    pd = StageGame(
-        ['c', 'd'],
-        [[3,-1],
-         [5, 0]],
-    )
-    sh = StageGame(
-        ['c', 'd'],
-        [[3,0],
-         [1,1]],
-    )
-    game_matrix = [[pd, sh],
-                   [sh, pd]]
-    interaction_matrix = [[0.5,0.5],
-                          [0.5,0.5]]
-
-    groups = make_groups(interaction_matrix, game_matrix)
-    
-
-
-
     """
-    def make_example_social_game():
-
-        pd = StageGame()
-        sh = StageGame([[3, 0],[0,1]])
-        sg1 = SocialGroup(sh, pd)
-        sg2 = SocialGroup(pd, sh)
-        return SocialGame([sg1, sg2], structure)
-
-    def example_phase_plot():
-        g = make_example_social_game()
-        g.plot_phase_space()
-
-    def explore_biased_pd():
-
-        pd with ingroup bias
-
-        pd_payoff = np.array([[3,-1],[5,0]])
-
-    example_phase_plot()
+    Code here tests the above functions
     """
+pd = StageGame(
+    ['c', 'd'],
+    [[3,-1],
+     [5, 0]],
+)
+sh = StageGame(
+    ['c', 'd'],
+    [[3,0],
+     [1,1]],
+)
+
+game_matrix = [[sh, pd],
+               [pd, sh]]
+interaction_matrix = [[0.8, 0.2],
+                      [0.2, 0.8]]
+groups = make_groups(interaction_matrix, game_matrix)
+
+sg = SocialGame(groups)
+sg.plot_phase_space()

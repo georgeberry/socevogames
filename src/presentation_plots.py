@@ -1,38 +1,29 @@
 from social_replicator import *
 
-rand_structure = [
-    [.5,.5],
-    [.5,.5]
-]
-low_h_structure = [
-    [.6,.4],
-    [.4,.6]
-]
-med_h_structure = [
-    [.7,.3],
-    [.3,.7]
-]
-high_h_structure = [
-    [.8,.2],
-    [.2,.8],
-]
+#### Setup params ##############################################################
 
-pd = StageGame([
-    [3,0],
-    [5,1],
-])
-sh = StageGame([
-    [3,0],
-    [1,1],
-])
-ck = StageGame([
-    [0,-1],
-    [1,-10],
-])
-pd_bias = StageGame([
-    [6,0],
-    [5,1],
-])
+
+rand_structure = [[0.5, 0.5],
+                  [0.5, 0.5]]
+high_h_structure = [[0.8, 0.2],
+                    [0.2, 0.8]]
+
+pd_pd_matrix = [[pd, pd],
+                [pd, pd]]
+sh_pd_matrix = [[sh, pd],
+                [pd, sh]]
+ck_pd_matrix = [[ck, pd],
+                [pd, ck]]
+sh_sh_matrix = [[sh, sh],
+                [sh, sh]]
+sh_ck_matrix = [[sh, ck],
+                [ck, sh]]
+ck_ck_matrix = [[ck, ck],
+                [ck, ck]]
+
+
+sg = SocialGame(groups)
+sg.plot_phase_space()
 
 #### PD ########################################################################
 
@@ -185,4 +176,25 @@ sh_ck_high_h.plot_phase_space(
     title="SH-CK, high ingroup association",
     path="../plots/",
     fname="sh_ck_high_h",
+)
+
+#### Biased PD #################################################################
+
+pd_bias_grp1 = SocialGroup(pd, pd_bias)
+pd_bias_grp2 = SocialGroup(pd_bias, pd)
+
+# pure pd #
+sh_ck_no_h = SocialGame([pd_bias_grp1, pd_bias_grp2], rand_structure)
+sh_ck_no_h.plot_phase_space(
+    title="Bias PD, random mixing",
+    path="../plots/",
+    fname="bias_pd_no_h",
+)
+
+# with homophily #
+sh_ck_high_h = SocialGame([pd_bias_grp1, pd_bias_grp2], high_h_structure)
+sh_ck_high_h.plot_phase_space(
+    title="Bias PD, high ingroup association",
+    path="../plots/",
+    fname="bias_pd_high_h",
 )
